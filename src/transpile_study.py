@@ -1,42 +1,43 @@
-import os
+import json
+from pathlib import Path
+
 import pandas as pd
-from qiskit import transpile
-from src.qaoa_circuit import build_qaoa_circuit
+
+from src.problem import load_edges, reduce_fix_vertex
 from src.processors import load_processor
+from src.qaoa_circuit import build_qaoa_circuit
+from src.routing import seed_study
 
-# Load processors A and B using correct function
-proc_a = load_processor("processors/processor_A.json")
-proc_b = load_processor("processors/processor_B.json")
+params = json.loads(Path("results/tables/best_params.json").read_text())
+all_edges = load_edges("data/raw/instance_seed42.txt")
+red_edges, linear, kept = reduce_fix_vertex(all_edges, 6, fixed=4)
 
-# Note: transpile takes backend or coupling map / target. Let's use Qiskit Aer backend or target from JSON if needed.
-# For pure transpile study with coupling map:
-from qiskit.transpiler import CouplingMap
-cmap_a = CouplingMap(proc_a["coupling_map"])
-cmap_b = CouplingMap(proc_b["coupling_map"])
+procs = [load_processor("processors/processor_A.json"),
+         load_processor("processors/processor_B.json")]
 
-qc = build_qaoa_circuit(gamma=2.62, beta=5.54)
+circuits = {
+    "full_6q": build_qaoa_circuit(params["full"]["gamma"], params["full"]["beta"],
+                                  all_edges, {}, 6),
+    "reduced_5q": build_qaoa_circuit(params["reduced"]["gamma"], params["reduced"]["beta"],
+                                     red_edges, linear, 5),
+}
 
-results = []
-for proc_name, cmap in [("Processor_A", cmap_a), ("Processor_B", cmap_b)]:
-    for seed in range(20):
-        t_qc = transpile(qc, coupling_map=cmap, optimization_level=3, seed_transpiler=seed)
-        op_counts = t_qc.count_ops()
-        cx_count = op_counts.get('cx', 0)
-        swap_count = op_counts.get('swap', 0)
-        effective_cx = cx_count + 3 * swap_count
-        
-        results.append({
-            "Processor": proc_name,
-            "Seed": seed,
-            "Depth": t_qc.depth(),
-            "CX": cx_count,
-            "SWAP": swap_count,
-            "Effective_CX": effective_cx,
-            "Qubits_Used": len(t_qc.active_ancillas) if hasattr(t_qc, 'active_ancillas') else 5
-        })
+frames, notes = [], []
+for pname, qc in circuits.items():
+    for proc in procs:
+        try:
+            df = seed_study(qc, proc)   # 20 seeds, same optimization level
+            df["problem"] = pname
+            frames.append(df)
+        except Exception as e:
+            notes.append(f"{pname} on {proc['name']}: cannot be transpiled "
+                         f"({type(e).__name__}: {e})")
 
-os.makedirs("results/tables", exist_ok=True)
-df = pd.DataFrame(results)
-df.to_csv("results/tables/transpile_summary.csv", index=False)
-print("Transpile study complete! Summary saved to results/tables/transpile_summary.csv")
-print(df.groupby("Processor")[["Depth", "Effective_CX"]].mean())
+Path("results/tables").mkdir(parents=True, exist_ok=True)
+out = pd.concat(frames)
+out.to_csv("results/tables/transpile_summary.csv", index=False)
+Path("results/tables/feasibility_notes.txt").write_text("\n".join(notes))
+
+cols = ["depth", "cx", "swap", "effective_cx", "qubits_used"]
+print(out.groupby(["problem", "processor"])[cols].agg(["mean", "std"]).round(2))
+print("\n".join(notes))
