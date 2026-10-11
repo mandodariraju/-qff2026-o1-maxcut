@@ -31,5 +31,4 @@ Open `main.ipynb` and run all cells top to bottom. Results are saved in `results
 ## Limitations
 (See `report.md`.)
 
-## AI assistance disclosure
-(Edit this to match what you actually did.) An AI assistant was used for planning, debugging help and documentation structure. The QAOA circuit and the optimization loop were implemented by the team.
+An AI assistant was used for planning, debugging help, documentation structure, and for the classical helper code (src/problem.py, src/routing.py). The QAOA circuit construction and the optimization loop were implemented by the team.
