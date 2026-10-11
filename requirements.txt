@@ -1,1 +1,8 @@
-
+qiskit
+qiskit-aer
+networkx
+scipy
+pandas
+matplotlib
+jupyter
+ipykernel
