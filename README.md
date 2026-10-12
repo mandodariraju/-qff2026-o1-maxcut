@@ -72,7 +72,7 @@ The best sampled cut equals the optimum (29) in every noisy run, so it is not a 
 - `src/`: problem, QUBO, QAOA circuit, optimizer, transpile study, noisy simulation, figures
 - `tests/`: QUBO test
 - `processors/`: Processor A and B definitions (JSON)
-- `data/raw/`: the instance used
+- `data/raw/`: the instance used; `data/processed/`: the QUBO matrix Q (x^T Q x = -cut)
 - `results/tables`, `results/figures`: all outputs
 - `report.md`: analysis
 
