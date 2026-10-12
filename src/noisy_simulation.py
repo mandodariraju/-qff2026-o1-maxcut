@@ -82,7 +82,7 @@ for name, pr in problems.items():
                                 optimization_level=1, seed_transpiler=s)
                 counts = sim.run(tqc, shots=SHOTS, seed_simulator=s).result().get_counts()
                 vals.append(evaluate(counts, pr))
-                       arr = np.array([v[:3] for v in vals], dtype=float)
+            arr = np.array([v[:3] for v in vals], dtype=float)
             top_bits = Counter(v[3] for v in vals).most_common(1)[0][0]
             rows.append(dict(problem=name, case="noisy", processor=proc["name"],
                              two_qubit_error=p2,
