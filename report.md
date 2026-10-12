@@ -31,13 +31,15 @@ Weighted Max-Cut on a 6-vertex graph (12 edges, weights 1-5, total weight 39, se
 
 Best sampled cut is 29 (the optimum) in all noisy runs (bitstring 001001 for the full problem, 00101 for the reduced one), so it does not separate the cases.
 
-### 4.2 Architecture metrics (mean over 20 transpiler seeds)
-| Problem | Processor | Depth | CX | SWAP | Effective CX (cx + 3 swap) |
-|---|---|---|---|---|---|
-| Full 6q | A | cannot be transpiled | n/a | n/a | n/a |
-| Full 6q | B | 45.5 | 24 | 2.3 | 30.9 |
-| Reduced 5q | A | 43.4 | 18 | 4.0 | 30.0 |
-| Reduced 5q | B | 35.2 | 18 | 1.5 | 22.5 |
+### 4.2 Architecture metrics (mean ± std over 20 transpiler seeds)
+| Problem | Processor | Depth | CX | SWAP | Effective CX (cx + 3 swap) | Qubits used |
+|---|---|---|---|---|---|---|
+| Full 6q | A | cannot be transpiled | n/a | n/a | n/a | n/a |
+| Full 6q | B | 45.5 ± 7.47 | 24 ± 0 | 2.3 ± 0.47 | 30.9 ± 1.41 | 6 |
+| Reduced 5q | A | 43.4 ± 5.51 | 18 ± 0 | 4.0 ± 0.00 | 30.0 ± 0.00 | 5 |
+| Reduced 5q | B | 35.2 ± 4.91 | 18 ± 0 | 1.5 ± 0.51 | 22.5 ± 1.54 | 5 |
+
+Minimum CX before routing: 24 (full), 18 (reduced). The CX column is the CX count after transpilation, with routing SWAPs counted separately; effective CX adds 3 CX per SWAP. On Processor A every seed gave exactly 4 SWAPs for the reduced problem. Depth varies a lot between seeds (std 5 to 7), so the depth difference between A and B is less clear than the SWAP and effective-CX differences.
 
 Minimum CX before routing: 24 (full), 18 (reduced). The CX column for the reduced problem is derived from effective CX minus 3 x SWAP. Standard deviations are in `results/tables/transpile_summary.csv` and in `main.ipynb` section 5.
 
