@@ -56,7 +56,7 @@ for c in cols:
     comp[f"{c}_A"] = a.loc[common, f"{c}_mean"]
     comp[f"{c}_B"] = b.loc[common, f"{c}_mean"]
     comp[f"{c}_B_minus_A"] = comp[f"{c}_B"] - comp[f"{c}_A"]
-comp.reset_index().to_csv(TAB / "AB_comparison.csv", index=False)
+comp.round(3).reset_index().to_csv(TAB / "AB_comparison.csv", index=False)
 
 q1 = pd.read_csv(TAB / "quality_summary.csv")
 q1 = q1[q1["status"] == "ok"]
