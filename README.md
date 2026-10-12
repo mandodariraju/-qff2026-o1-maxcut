@@ -5,6 +5,21 @@ Project Q (IBM Qiskit Fall Fest 2026, SRM University-AP), Phase 1, **PS-O1: Weig
 ## Selected problem statement
 PS-O1: Max-Cut on a weighted graph with 6 vertices and integer weights 1-5. We build the QUBO / Z_iZ_j cost Hamiltonian, run QAOA (p = 1) with a classical optimizer from several random starts, compare with the brute-force optimum, and compare Processor A vs Processor B (circuit depth, CX count, SWAP count, solution quality).
 
+## PS specification sheet
+| Item | Our value |
+|---|---|
+| PS code | O1 |
+| PS name | Max-Cut (weighted Max-Cut with QAOA) |
+| Track | Quantum Optimization |
+| Input / instance | Custom seeded 6-vertex weighted graph (seed 42, 12 edges, weights 1-5, total weight 39), `data/raw/instance_seed42.txt`. No official graph was provided. |
+| Core algorithm | QAOA, p = 1, COBYLA, 10 random restarts, exact statevector for the parameter search |
+| Required output | Best cut, its weight, distance to the brute-force optimum, weighted-graph plot, coupling diagrams of A and B |
+| Primary metric | Approximation ratio = expected cut / classical optimum (29); probability of the optimal bitstring |
+| Reference / classical baseline | Brute force over 64 bitstrings: optimum 29; random-guess baseline 19.5 |
+| Processor A requirements | 5 qubits, 4 couplings; cannot host the 6-qubit problem |
+| Processor B requirements | 9 qubits, 12 couplings; hosts the 6-qubit problem |
+| Architecture metrics | Depth, CX count, SWAP count, effective CX (cx + 3 swap), physical qubits used |
+
 ## Setup
 Python 3.14.2 (GitHub Codespaces). Versions are pinned in `requirements.txt`.
 ```
