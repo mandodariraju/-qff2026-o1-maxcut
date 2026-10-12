@@ -65,4 +65,4 @@ The best sampled cut equals the optimum (29) in every noisy run, so it is not a 
 - One graph instance, p = 1, simulated provisional noise, finite topologies. No universal claim. See `report.md`.
 
 ## AI assistance disclosure
-An AI assistant was used for planning,  documentation structure and some code: the classical helpers (`src/problem.py`, `src/routing.py`)
+An AI assistant was used for planning,  documentation structure and some code: the classical helpers (`src/problem.py`, `src/routing.py`).All results were produced by running the code in this repository.
