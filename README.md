@@ -35,6 +35,8 @@ python -m src.optimizer           # QAOA parameters, restarts table
 python -m src.transpile_study     # routing cost on A vs B (20 seeds)
 python -m src.noisy_simulation    # solution quality, ideal vs noisy
 python -m src.make_figures        # comparison figures
+python -m src.native5_study       # supplementary 5-vertex instance, native on A and B
+python -m src.make_extra_outputs  # extra figures, comparison tables, circuit text
 ```
 
 ## Methodology
@@ -67,6 +69,16 @@ Instance: optimum cut 29, random baseline 19.5. Ideal QAOA p = 1: expected cut 2
 
 The best sampled cut equals the optimum (29) in every noisy run, so it is not a useful quality metric; we use expected cut and P(optimal) instead.
 
+## Supplementary study: native 5-vertex instance (no vertex fixing)
+The official problem has 6 vertices, which Processor A (5 qubits) cannot host, and vertex fixing is not an approved method. To still compare A and B under identical conditions, we added a second custom instance with 5 vertices (`make_graph(5, seed=42)`, `data/raw/instance5_seed42.txt`, 8 edges, total weight 28, optimum cut 21, random baseline 14) that fits both processors natively. Same circuit, same optimizer (p = 1, COBYLA, 10 restarts), same transpiler settings (20 seeds), same provisional noise (8192 shots, 5 seeds). The main benchmark remains the 6-vertex problem.
+
+| Case | Expected cut | Ratio | P(optimal) |
+|---|---|---|---|
+| Native 5q, ideal | 17.526 | 0.835 | 0.166 |
+| Native 5q on A, CX error 0.005 / 0.01 | 17.100 / 16.911 | 0.814 / 0.805 | 0.149 / 0.142 |
+| Native 5q on B, CX error 0.005 / 0.01 | 17.147 / 17.008 | 0.817 / 0.810 | 0.153 / 0.149 |
+
+Routing (mean of 20 seeds): depth A 43.25 vs B 34.45, SWAP 3.00 vs 1.45, effective CX 25.0 vs 20.35 (16 CX before routing on both). More in `report.md`.
 ## Repository structure
 - `main.ipynb`: end-to-end run
 - `src/`: problem, QUBO, QAOA circuit, optimizer, transpile study, noisy simulation, figures
