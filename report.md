@@ -60,6 +60,23 @@ Custom 5-vertex instance (seed 42, edges (0,1,1),(0,3,2),(1,2,5),(1,3,4),(1,4,1)
 
 Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on average because some transpiler seeds placed the circuit on a sixth physical qubit.
 
+### 4.4 Supplementary: native 5-vertex instance (no vertex fixing)
+Custom 5-vertex instance (seed 42, edges (0,1,1),(0,3,2),(1,2,5),(1,3,4),(1,4,1),(2,3,5),(2,4,5),(3,4,5), total weight 28). Optimum cut 21 (bitstrings 00110 and 11001), random baseline 14. QAOA p = 1, 10 restarts: expected cut mean 16.569, min 15.161, max 17.526 (ratio 0.835). It fits Processor A and B natively, so no reduction is needed. This instance has 5 vertices and is an additional study; the 6-vertex problem is the main benchmark.
+
+| Metric | Processor A | Processor B | B minus A |
+|---|---|---|---|
+| Depth | 43.25 ± 4.25 | 34.45 ± 3.85 | -8.8 |
+| CX after routing (16 before routing) | 16 | 16 | 0 |
+| SWAP | 3.00 ± 0.00 | 1.45 ± 0.51 | -1.55 |
+| Effective CX (cx + 3 swap) | 25.00 ± 0.00 | 20.35 ± 1.53 | -4.65 |
+| Qubits used | 5.0 | 5.1 ± 0.31 | +0.1 |
+| Expected cut, CX error 0.005 | 17.100 ± 0.025 | 17.147 ± 0.019 | +0.047 |
+| Expected cut, CX error 0.01 | 16.911 ± 0.023 | 17.008 ± 0.020 | +0.097 |
+| Ratio, 0.005 / 0.01 | 0.814 / 0.805 | 0.817 / 0.810 | +0.003 / +0.005 |
+| P(optimal), 0.005 / 0.01 | 0.149 / 0.142 | 0.153 / 0.149 | +0.004 / +0.007 |
+
+Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on average because some transpiler seeds placed the circuit on a sixth physical qubit.
+
 ## 5. Interpretation
 1. **What changed between A and B?** The full problem does not fit on A at all (6 qubits > 5). This is a qubit-count limit, not a connectivity limit. For the supplementary 5-qubit problem, B needed fewer SWAPs (1.5 vs 4.0), less depth (35.2 vs 43.4) and less effective CX (22.5 vs 30.0).
 2. **Architectural property:** Processor A is a tree with 4 edges, so many pairs of qubits that interact in the problem (9 two-qubit edges on 5 nodes) are not adjacent and need SWAPs. Processor B has 12 edges, cycles and a hub qubit with 5 neighbors (qubit 6), so more problem edges map to neighbors directly. This is our explanation from the coupling graphs; we did not run a separate experiment isolating each property.
@@ -75,4 +92,6 @@ Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on ave
 - Best sampled cut is not informative (always 29).
 
 ## 7. Conclusion
-QAOA (p = 1) reaches an expected cut of 24.784 on the full problem (ratio 0.855 vs optimum 29), and the best sampled cut finds the optimum in every run. Processor B can host the full problem; Processor A cannot. On the supplementary 5-qubit problem, B's richer connectivity cut routing overhead (SWAP 1.5 vs 4.0, effective CX 22.5 vs 30.0) and gave a small, consistent quality advantage under our provisional noise model.The same direction appears on a second, native 5-vertex instance that needs no vertex fixing (SWAP 1.45 vs 3.00, effective CX 20.35 vs 25.0, expected cut +0.047 / +0.097 for B).
+QAOA (p = 1) reaches an expected cut of 24.784 on the full problem (ratio 0.855 vs optimum 29), and the best sampled cut finds the optimum in every run. Processor B can host the full problem; Processor A cannot. On the supplementary 5-qubit problem, B's richer connectivity cut routing overhead (SWAP 1.5 vs 4.0, effective CX 22.5 vs 30.0) and gave a small, consistent quality advantage under our provisional noise model.
+
+The same direction appears on a second, native 5-vertex instance that needs no vertex fixing (SWAP 1.45 vs 3.00, effective CX 20.35 vs 25.0, expected cut +0.047 / +0.097 for B).

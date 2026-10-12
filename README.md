@@ -92,4 +92,4 @@ Routing (mean of 20 seeds): depth A 43.25 vs B 34.45, SWAP 3.00 vs 1.45, effecti
 - One graph instance, p = 1, simulated provisional noise, finite topologies. No universal claim. See `report.md`.
 
 ## AI assistance disclosure
-An AI assistant was used for planning,  documentation structure and some code: the classical helpers (`src/problem.py`, `src/routing.py`).All results were produced by running the code in this repository.
+An AI assistant (Claude) was used for planning, code review, debugging, documentation structure and some code: the classical helpers (`src/problem.py`, `src/routing.py`), the QUBO function and its test, the best-bitstring and restarts additions, `src/make_figures.py`, `src/native5_study.py`, `src/make_extra_outputs.py`, and the drafts of this README and `report.md`. All results were produced by running the code in this repository.
