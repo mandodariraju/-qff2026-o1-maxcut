@@ -5,7 +5,7 @@ import random
 from pathlib import Path
 
 import networkx as nx
-
+import numpy as np
 
 def make_graph(n=6, seed=42, edge_prob=0.7, w_min=1, w_max=5):
     """Random connected weighted graph. Returns a list of (i, j, w)."""
@@ -58,6 +58,17 @@ def key_to_bits(key):
     return key.replace(" ", "")[::-1]
 
 
+def maxcut_qubo(edges, n):
+    """QUBO matrix Q for Max-Cut, x in {0,1}^n.
+    cut(x) = sum w_ij (x_i + x_j - 2 x_i x_j), so x^T Q x = -cut(x).
+    Maximizing the cut = minimizing x^T Q x."""
+    Q = np.zeros((n, n))
+    for i, j, w in edges:
+        Q[i, i] -= w
+        Q[j, j] -= w
+        Q[i, j] += w
+        Q[j, i] += w
+    return Q
 def reduce_fix_vertex(edges, n, fixed=None):
     """Fix one vertex to side 0. Valid because flipping every vertex keeps the
     cut value. Returns (reduced_edges, linear, kept):
