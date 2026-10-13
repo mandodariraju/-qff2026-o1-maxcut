@@ -87,7 +87,8 @@ Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on ave
 7. **Second instance:** the native 5-vertex instance (no reduction) shows the same pattern as the reduced 6-vertex problem: fewer SWAPs on B (1.45 vs 3.00), less depth (34.45 vs 43.25), less effective CX (20.35 vs 25.0) and a small quality advantage for B (+0.047 and +0.097 expected cut, about 2 to 5 seed std over 5 seeds). Two instances, one processor pair, p = 1 and provisional noise do not support a general claim.
 
 ## 6. Limitations
-- Simulated, provisional noise only; one graph instance; p = 1; finite topologies. No universal claim.
+- Simulated, provisional noise only; two graph instances (6-vertex main benchmark, 5-vertex supplementary); p = 1; finite topologies. No universal claim.
+- Runtime was not measured.
 - Full 6-qubit problem could not be run on Processor A, so the A-vs-B comparison on quality uses the supplementary reduced problem.
 - Best sampled cut is not informative (always 29).
 

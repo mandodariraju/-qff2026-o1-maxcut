@@ -69,6 +69,8 @@ Instance: optimum cut 29, random baseline 19.5. Ideal QAOA p = 1: expected cut 2
 
 The best sampled cut equals the optimum (29) in every noisy run, so it is not a useful quality metric; we use expected cut and P(optimal) instead.
 
+**Best cut found:** weight 29 (bitstring 001001 on Processor B, full 6-vertex problem), distance to the brute-force optimum 0. The average QAOA cut is lower: expected cut 24.784 in the ideal case, 4.216 below the optimum 29.
+
 ## Supplementary study: native 5-vertex instance (no vertex fixing)
 The official problem has 6 vertices, which Processor A (5 qubits) cannot host, and vertex fixing is not an approved method. To still compare A and B under identical conditions, we added a second custom instance with 5 vertices (`make_graph(5, seed=42)`, `data/raw/instance5_seed42.txt`, 8 edges, total weight 28, optimum cut 21, random baseline 14) that fits both processors natively. Same circuit, same optimizer (p = 1, COBYLA, 10 restarts), same transpiler settings (20 seeds), same provisional noise (8192 shots, 5 seeds). The main benchmark remains the 6-vertex problem.
 
@@ -79,17 +81,20 @@ The official problem has 6 vertices, which Processor A (5 qubits) cannot host, a
 | Native 5q on B, CX error 0.005 / 0.01 | 17.147 / 17.008 | 0.817 / 0.810 | 0.153 / 0.149 |
 
 Routing (mean of 20 seeds): depth A 43.25 vs B 34.45, SWAP 3.00 vs 1.45, effective CX 25.0 vs 20.35 (16 CX before routing on both). More in `report.md`.
+
 ## Repository structure
 - `main.ipynb`: end-to-end run
 - `src/`: problem, QUBO, QAOA circuit, optimizer, transpile study, noisy simulation, figures
 - `tests/`: QUBO test
 - `processors/`: Processor A and B definitions (JSON)
 - `data/raw/`: the instance used; `data/processed/`: the QUBO matrix Q (x^T Q x = -cut)
-- `results/tables`, `results/figures`: all outputs
+- `results/tables`, `results/figures`, `results/circuits`: all outputs (CSV tables, figures, transpiled circuit text)
 - `report.md`: analysis
 
 ## Limitations
-- One graph instance, p = 1, simulated provisional noise, finite topologies. No universal claim. See `report.md`.
+- Two graph instances (6-vertex main benchmark, 5-vertex supplementary), p = 1, simulated provisional noise, finite topologies. No universal claim.
+- The 6-vertex problem cannot run on Processor A (5 qubits), so the A-vs-B comparison uses the supplementary instances (5-vertex native instance; vertex-fixed reduction, not organizer-approved).
+- Runtime was not measured. See `report.md`.
 
 ## AI assistance disclosure
 An AI assistant (Claude) was used for planning, code review, debugging, documentation structure and some code: the classical helpers (`src/problem.py`, `src/routing.py`), the QUBO function and its test, the best-bitstring and restarts additions, `src/make_figures.py`, `src/native5_study.py`, `src/make_extra_outputs.py`, and the drafts of this README and `report.md`. All results were produced by running the code in this repository.
