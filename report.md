@@ -89,7 +89,7 @@ Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on ave
 ## 6. Limitations
 - Simulated, provisional noise only; two graph instances (6-vertex main benchmark, 5-vertex supplementary); p = 1; finite topologies. No universal claim.
 - Runtime was not measured.
-- Full 6-qubit problem could not be run on Processor A, so the A-vs-B comparison on quality uses the supplementary reduced problem.
+- Full 6-qubit problem could not be run on Processor A, so the A-vs-B comparison on quality uses the supplementary problems (vertex-fixed reduction, not organizer-approved, and the native 5-vertex instance).
 - Best sampled cut is not informative (always 29).
 
 ## 7. Conclusion
