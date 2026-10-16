@@ -96,3 +96,25 @@ Ideal reference: expected cut 17.526, P(optimal) 0.166. B uses 5.1 qubits on ave
 QAOA (p = 1) reaches an expected cut of 24.784 on the full problem (ratio 0.855 vs optimum 29), and the best sampled cut finds the optimum in every run. Processor B can host the full problem; Processor A cannot. On the supplementary 5-qubit problem, B's richer connectivity cut routing overhead (SWAP 1.5 vs 4.0, effective CX 22.5 vs 30.0) and gave a small, consistent quality advantage under our provisional noise model.
 
 The same direction appears on a second, native 5-vertex instance that needs no vertex fixing (SWAP 1.45 vs 3.00, effective CX 20.35 vs 25.0, expected cut +0.047 / +0.097 for B).
+
+## 8. Problem faced and proposed Processor D (design proposal, not benchmarked)
+This section is design reasoning built on the measured A/B results above. No Processor D run is reported here.
+
+### 8.1 Problems faced when running PS-O1 on Processors A and B
+1. **Qubit count:** PS-O1 has 6 vertices, so the circuit needs 6 qubits; Processor A has 5. Transpilation fails with CircuitTooWideForTarget (`results/tables/feasibility_notes.txt`). Vertex fixing is not an approved method, so the full problem runs on B only.
+2. **Connectivity:** Processor A has 4 couplings (a tree). The reduced problem has 9 and the native 5-vertex problem has 8 interacting pairs, so at least 5 of the 9 (reduced) and at least 4 of the 8 (native) interacting pairs are not adjacent on A. Measured SWAPs on A vs B: 4.0 vs 1.5 (reduced), 3.0 vs 1.45 (native). Effective CX: 30.0 vs 22.5 and 25.0 vs 20.35.
+3. **Cost floor:** each RZZ costs 2 CX, so the full problem needs at least 24 CX before routing. On B routing added about 2.3 SWAPs (about 6.9 CX).
+4. **Quality under noise:** more CX gave a lower expected cut under the provisional noise, with small gaps between B and A (+0.094 / +0.189 reduced, +0.047 / +0.097 native).
+
+### 8.2 Design goals for Processor D
+- At least 6 qubits, so PS-O1 fits natively without any reduction.
+- Dense connectivity among the qubits that are used. Our instance has 12 of the 15 possible vertex pairs and two vertices of degree 5. B has 9 qubits but only 12 couplings, and its used qubits still needed 2.3 SWAPs on average, so spare qubits alone do not remove routing.
+- Cycles and a high-degree hub. B's lower SWAP count came from cycles and a degree-5 hub, not from qubit count (A and B both used about 5 qubits on the 5-vertex problems).
+- Same basis gates (rz, sx, x, cx) and the same noise as A and B, so only the topology differs and connectivity effects are not mixed with gate-set effects.
+
+### 8.3 Proposal
+Processor D: 6 physical qubits, two hub qubits (0 and 1) coupled to each other and to the four rim qubits (2, 3, 4, 5), and the rim qubits form a ring 2-3-4-5-2. That is 13 couplings out of the 15 possible; only (2,4) and (3,5) are missing.
+
+**Hypothesis (not yet verified by transpilation):** our seed-42 instance is the complete graph on 6 vertices minus the three pairs (0,2), (0,4), (3,4). Two of those missing pairs, (0,2) and (3,4), are disjoint, so a layout exists where all 12 interacting pairs are direct couplings. We therefore expect 0 SWAPs and 24 CX on D (B: 24 CX plus about 2.3 SWAPs). A different dense 6-vertex instance may still need a SWAP.
+
+**Trade-offs and uncertainty:** D has no spare qubits, 13 couplers are more hardware than B's 12 for 6 usable qubits, and the idea may not scale to larger graphs because the coupler count grows quickly. The expectation above must be tested with the same `seed_study` used for A and B before it counts as evidence.
