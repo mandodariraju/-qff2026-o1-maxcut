@@ -14,7 +14,7 @@ from src.problem import (load_edges, reduce_fix_vertex, reduced_cut_value,
 from src.processors import load_processor, build_noise_model, build_coupling_map
 from src.qaoa_circuit import build_qaoa_circuit
 
-SHOTS = 8192
+SHOTS = 4096
 TRANSPILE_SEEDS = range(5)
 TWO_Q_ERRORS = [0.005, 0.01]  # both appear in organizer material; neither is official
 

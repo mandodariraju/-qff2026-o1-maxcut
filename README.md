@@ -21,7 +21,7 @@ PS-O1: Max-Cut on a weighted graph with 6 vertices and integer weights 1-5. We b
 | Architecture metrics | Depth, CX count, SWAP count, effective CX (cx + 3 swap), physical qubits used |
 
 ## Setup
-Python 3.14.2 (GitHub Codespaces). Versions are pinned in `requirements.txt`.
+Python 3.14.2 (GitHub Codespaces). Versions are pinned in `requirements.txt` (the pins that matter are qiskit==2.5.2 and qiskit-aer==0.17.2). Other Python versions, for example 3.12, were not tested by us.
 ```
 pip install -r requirements.txt
 ```
@@ -45,14 +45,15 @@ python -m src.make_extra_outputs  # extra figures, comparison tables, circuit te
 - **QAOA:** p = 1, cost layer from the Z_iZ_j terms, mixer RX. The cost-layer phase and sign were tested in `main.ipynb` (section 3).
 - **Optimizer:** COBYLA, 10 random restarts, exact statevector expected cut. Angles are periodic and symmetric, so we report the expected cut and not gamma/beta. Every restart is saved in `results/tables/restarts.csv`.
 - **Processors:** built from the slide-4 diagrams of the organizer deck and checked against them up to relabeling (`main.ipynb`, section 1). A: 5 qubits, 4 edges. B: 9 qubits, 12 edges (organizers confirmed 9 qubits, the "7 qubits" label in the deck is wrong).
-- **Transpilation study:** same circuit, `optimization_level=1`, 20 transpiler seeds per processor, SWAP kept in the basis so routing SWAPs are visible, `effective_cx = cx + 3 * swap`.
-- **Noisy simulation:** Aer, depolarizing noise on sx, x (0.001) and cx (0.005 and 0.01), readout error, 8192 shots, 5 transpiler seeds.
+- **Transpilation study:** same circuit, `optimization_level=1`, 20 transpiler seeds per processor, SWAP kept in the basis so routing SWAPs are visible, `effective_cx = cx + 3 * swap`. This basis (rz, sx, x, cx, swap) differs from the fixed basis rz, sx, x, cx, so raw CX and depth are not directly comparable with other teams; effective CX converts each SWAP to 3 CX.
+- **Noisy simulation:** Aer, depolarizing noise on sx, x (0.001) and cx (0.005 and 0.01), symmetric readout error 0.01, 4096 shots (the Kit's fixed value), 5 transpiler seeds. The noisy runs use the fixed basis rz, sx, x, cx.
 - **Metrics:** approximation ratio (expected cut / optimum), probability of an optimal bitstring (bitstring and its complement), depth, CX count, SWAP count.
 
 ## Assumptions
+- **Processor map set:** Set 1 (Benchmark Configuration, the slide-4 drawings). A is T-shaped: (0,1),(1,2),(1,3),(3,4). B has 9 qubits and 12 edges: (0,1),(1,2),(1,6),(2,3),(2,6),(2,5),(3,4),(4,5),(5,6),(6,7),(6,8),(8,0). Maps from the Challenge Kit (Set 2) were not mixed in. The organizers confirmed that B has 9 qubits.
 - No official PS-O1 graph was provided (organizer reply), so we use a custom seeded instance.
-- Noise values and basis gates are **not official** until after Phase 1 shortlisting (organizer reply). Both CX errors 0.005 and 0.01 appear in the materials; neither is official. Our values in `processors/*.json` are provisional: 1q depolarizing 0.001, readout [[0.99, 0.01], [0.02, 0.98]], basis rz, sx, x, cx.
-- Processor A has 5 qubits, so the full 6-qubit problem cannot be run on it (`results/tables/feasibility_notes.txt`).
+- Noise values and basis gates are **not official** until after Phase 1 shortlisting (organizer reply). Both CX errors 0.005 and 0.01 appear in the materials; neither is official. Our values in `processors/*.json` are provisional: 1q depolarizing 0.001, symmetric readout error 0.01 ([[0.99, 0.01], [0.01, 0.99]]), basis rz, sx, x, cx.
+- Processor A has 5 qubits, so the full 6-qubit problem cannot be run on it (`results/tables/feasibility_notes.txt`). In the results tables the A row for the 6-vertex problem is kept with `logical_qubits = 6`, empty metrics and the note `not run: needs N > 5 qubits` (`results/tables/benchmark_rows.csv`).
 - **Supplementary only:** fixing vertex 4 gives a 5-qubit problem that fits Processor A. Vertex fixing is **not an organizer-approved method**, so the main benchmark is the full 6-qubit problem and the reduction is reported separately and clearly labeled.
 
 ## Key results
@@ -61,24 +62,24 @@ Instance: optimum cut 29, random baseline 19.5. Ideal QAOA p = 1: expected cut 2
 | Case | Expected cut | Ratio | P(optimal) |
 |---|---|---|---|
 | Full 6q, ideal | 24.784 | 0.855 | 0.098 |
-| Full 6q on B, CX error 0.005 / 0.01 | 24.124 / 23.835 | 0.832 / 0.822 | 0.089 / 0.084 |
-| Full 6q on A | not possible (6 qubits > 5) | n/a | n/a |
-| Reduced 5q, ideal (supplementary) | 24.546 | 0.846 | 0.089 |
-| Reduced 5q on A, 0.005 / 0.01 | 23.913 / 23.601 | 0.825 / 0.814 | 0.083 / 0.079 |
-| Reduced 5q on B, 0.005 / 0.01 | 24.007 / 23.790 | 0.828 / 0.820 | 0.084 / 0.081 |
+| Full 6q on B, CX error 0.005 / 0.01 | 24.207 / 23.907 | 0.835 / 0.824 | 0.090 / 0.086 |
+| Full 6q on A | not run: needs N > 5 qubits | n/a | n/a |
+| Reduced 5q (vertex-fixed, NOT approved), ideal | 24.546 | 0.846 | 0.089 |
+| Reduced 5q (vertex-fixed, NOT approved) on A, 0.005 / 0.01 | 23.954 / 23.640 | 0.826 / 0.815 | 0.080 / 0.076 |
+| Reduced 5q (vertex-fixed, NOT approved) on B, 0.005 / 0.01 | 24.117 / 23.906 | 0.832 / 0.824 | 0.080 / 0.078 |
 
 The best sampled cut equals the optimum (29) in every noisy run, so it is not a useful quality metric; we use expected cut and P(optimal) instead.
 
 **Best cut found:** weight 29 (bitstring 001001 on Processor B, full 6-vertex problem), distance to the brute-force optimum 0. The average QAOA cut is lower: expected cut 24.784 in the ideal case, 4.216 below the optimum 29.
 
 ## Supplementary study: native 5-vertex instance (no vertex fixing)
-The official problem has 6 vertices, which Processor A (5 qubits) cannot host, and vertex fixing is not an approved method. To still compare A and B under identical conditions, we added a second custom instance with 5 vertices (`make_graph(5, seed=42)`, `data/raw/instance5_seed42.txt`, 8 edges, total weight 28, optimum cut 21, random baseline 14) that fits both processors natively. Same circuit, same optimizer (p = 1, COBYLA, 10 restarts), same transpiler settings (20 seeds), same provisional noise (8192 shots, 5 seeds). The main benchmark remains the 6-vertex problem.
+The official problem has 6 vertices, which Processor A (5 qubits) cannot host, and vertex fixing is not an approved method. To still compare A and B under identical conditions, we added a second custom instance with 5 vertices (`make_graph(5, seed=42)`, `data/raw/instance5_seed42.txt`, 8 edges, total weight 28, optimum cut 21, random baseline 14) that fits both processors natively. Same circuit, same optimizer (p = 1, COBYLA, 10 restarts), same transpiler settings (20 seeds), same provisional noise (4096 shots, 5 seeds). The main benchmark remains the 6-vertex problem.
 
 | Case | Expected cut | Ratio | P(optimal) |
 |---|---|---|---|
 | Native 5q, ideal | 17.526 | 0.835 | 0.166 |
-| Native 5q on A, CX error 0.005 / 0.01 | 17.100 / 16.911 | 0.814 / 0.805 | 0.149 / 0.142 |
-| Native 5q on B, CX error 0.005 / 0.01 | 17.147 / 17.008 | 0.817 / 0.810 | 0.153 / 0.149 |
+| Native 5q on A, CX error 0.005 / 0.01 | 17.162 / 16.955 | 0.817 / 0.807 | 0.154 / 0.147 |
+| Native 5q on B, CX error 0.005 / 0.01 | 17.211 / 17.061 | 0.820 / 0.812 | 0.156 / 0.151 |
 
 Routing (mean of 20 seeds): depth A 43.25 vs B 34.45, SWAP 3.00 vs 1.45, effective CX 25.0 vs 20.35 (16 CX before routing on both). More in `report.md`.
 

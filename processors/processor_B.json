@@ -7,7 +7,7 @@
     "status": "provisional_pending_organizer_confirmation",
     "one_qubit_depolarizing": 0.001,
     "two_qubit_depolarizing": 0.005,
-    "readout_error": [[0.99, 0.01], [0.02, 0.98]]
+    "readout_error": [[0.99, 0.01], [0.01, 0.99]]
   },
   "source": "Processor A/B Benchmark Configuration PDF (marked For Organizer Approval)"
 }

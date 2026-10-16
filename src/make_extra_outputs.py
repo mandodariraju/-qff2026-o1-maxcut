@@ -120,3 +120,33 @@ plt.close(fig)
 print("saved tables:", sorted(p.name for p in TAB.glob("*.csv")))
 print("saved figures:", sorted(p.name for p in FIG.glob("*.png")))
 print("saved circuits:", sorted(p.name for p in CIRC.glob("*.txt")))
+
+# 5) Benchmark rows in the organizers' column naming, incl. the 6-vertex row for Processor A
+NOT_RUN = "not run: needs N > 5 qubits"
+ids = {"full_6q": "ps_o1_seed42", "reduced_5q": "ps_o1_seed42_reduced5_NOT_APPROVED",
+       "native_5q": "native5_seed42_extra"}
+nq = {"full_6q": 6, "reduced_5q": 5, "native_5q": 5}
+brow = []
+for prob in ["full_6q", "reduced_5q", "native_5q"]:
+    for pn in ["processor_A", "processor_B"]:
+        s = agg[(agg["problem"] == prob) & (agg["processor"] == pn)]
+        base = dict(instance_id=ids[prob], processor=pn, logical_qubits=nq[prob])
+        if len(s):
+            r = s.iloc[0]
+            brow.append({**base, "cx_count": r["cx_mean"], "depth": r["depth_mean"],
+                         "swap_count": r["swap_mean"], "effective_cx": r["effective_cx_mean"],
+                         "noise_model": "transpile only (20 seeds, swap kept in basis)", "note": ""})
+        else:
+            brow.append({**base, "cx_count": "", "depth": "", "swap_count": "", "effective_cx": "",
+                         "noise_model": NOT_RUN,
+                         "note": "full problem runs on B only; A is a capacity reference"})
+pd.DataFrame(brow).to_csv(TAB / "benchmark_rows.csv", index=False)
+
+fin2 = pd.read_csv(TAB / "final_comparison.csv")
+fin2["logical_qubits"] = fin2["problem"].map(nq)
+fin2["noise_model"] = fin2["case"].map({"ideal": "ideal statevector",
+                                        "noisy": "depolarizing + readout (provisional)"})
+extra = pd.DataFrame([dict(problem="full_6q", case="noisy", processor="processor_A",
+                           logical_qubits=6, noise_model=NOT_RUN)])
+pd.concat([fin2, extra], ignore_index=True).to_csv(TAB / "final_comparison.csv", index=False)
+print("saved benchmark_rows.csv and A row in final_comparison.csv")

@@ -18,7 +18,7 @@ from src.qaoa_circuit import build_qaoa_circuit
 from src.routing import seed_study
 
 N, SEED = 5, 42
-SHOTS = 8192
+SHOTS = 4096
 TRANSPILE_SEEDS = range(5)
 TWO_Q_ERRORS = [0.005, 0.01]  # both appear in organizer material; neither is official
 TAB = Path("results/tables")
