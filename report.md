@@ -9,7 +9,7 @@ Weighted Max-Cut on a 6-vertex graph (12 edges, weights 1-5, total weight 39, se
 - Main benchmark: the full 6-qubit problem. Supplementary: our own 5-variable reduction (vertex 4 fixed to side 0, which keeps the optimum 29). The reduction is not organizer-approved and is reported separately.
 
 ## 3. Assumptions and setup
-- Processors built from the organizer slide-4 diagrams. A: 5 qubits, edges (0,1),(1,2),(1,3),(3,4). B: 9 qubits, 12 edges.
+- Processors built from the organizer slide-4 diagrams. A: 5 qubits, edges (0,1),(1,2),(1,3),(3,4). B: 9 qubits, 12 edges. Processor A's slide-4 drawing is T-shaped (qubit 1 has three neighbours), not a linear chain. The deck label "7 qubits" for B is wrong according to the organizers' written reply; the drawing has 9 nodes and the organizers confirmed 9. B contains cycles (for example the triangle 1-2-6), so it is not a bipartite heavy-hex layout. Both maps are in `processors/*.json`.
 - Noise (provisional, not official): 1q depolarizing 0.001 on sx and x, 2q depolarizing on cx 0.005 and 0.01, readout error, basis rz, sx, x, cx. A and B use the same values, so differences come from topology only.
 - Transpiler: optimization_level 1, 20 seeds (routing study), 5 seeds (noisy runs), 8192 shots.
 - Custom instance because no official graph was provided.
